@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+
+  demo_image:
+    image: autotest_nb:v0.1
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: autotest_nbgrader
+    labels:
+      - "traefik.enable=false"
+    volumes:
+      - ./source:/home/jovyan/source
+      - ./release:/home/jovyan/release
+      - ./instantiated:/home/jovyan/instantiated
+    ports:
+      - "8888:8888"
+    command: ["jupyter", "notebook","--NotebookApp.token=''","--debug"]
