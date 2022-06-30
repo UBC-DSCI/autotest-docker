@@ -84,8 +84,6 @@ RUN echo "Moving nbgrader_config.py and tests.yml into home"
 COPY --chown=${NB_USER}:${NB_USER} ./nbgrader_config.py ${HOME}/
 COPY --chown=${NB_USER}:${NB_USER} ./tests.yml ${HOME}/
 
-COPY . ${HOME}/
-
 # Switch to jovyan user
 USER ${NB_USER}
 WORKDIR ${HOME}
