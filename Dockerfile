@@ -84,6 +84,9 @@ RUN echo "Moving nbgrader_config.py and tests.yml into home"
 COPY --chown=${NB_USER}:${NB_USER} ./nbgrader_config.py ${HOME}/
 COPY --chown=${NB_USER}:${NB_USER} ./tests.yml ${HOME}/
 
+# Installing R
+RUN apt-get install -y r-base 
+
 # Switch to jovyan user
 USER ${NB_USER}
 WORKDIR ${HOME}
@@ -120,6 +123,10 @@ RUN echo "Installing/enabling nbgrader extensions..." \
     && jupyter nbextension install --sys-prefix --py nbgrader --overwrite \
     && jupyter nbextension enable --sys-prefix --py nbgrader \
     && jupyter serverextension enable --sys-prefix --py nbgrader
+
+# Installing IR kernel
+RUN Rscript -e "install.packages('IRkernel')"
+RUN Rscript -e "IRkernel::installspec()"
 
 ## document exposed port 8888 for jupyter notebook
 EXPOSE 8888
