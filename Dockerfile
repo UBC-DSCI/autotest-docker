@@ -59,9 +59,8 @@ RUN echo "Creating ${NB_USER} user and home folder structure..." \
 
 RUN echo "Installing basic apt-get packages..." \
     && apt-get update --fix-missing \
-    && apt-get install -y apt-utils 2> /dev/null \
-    && apt-get install -y wget zip tzdata \
-    && apt-get install -y git \
+    && apt-get install -y apt-utils \
+    && apt-get install -y wget zip tzdata git build-essential gcc g++ gfortran \ 
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -95,6 +94,9 @@ RUN wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc |
 RUN add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
 RUN apt-get install --no-install-recommends -y r-base
 
+# install IR kernel
+RUN Rscript -e "install.packages('IRkernel')"
+
 # Switch to jovyan user
 USER ${NB_USER}
 WORKDIR ${HOME}
@@ -124,6 +126,7 @@ RUN echo "Installing Miniforge..." \
 ## installing nbgrader dependencies
 RUN conda install -c bitsort "nodejs>=12"
 RUN conda install -c conda-forge yarn
+RUN conda install -c conda-forge pyyaml
 
 #RUN python -m pip install --upgrade pip setuptools wheel
 
@@ -135,8 +138,7 @@ RUN echo "Installing/enabling nbgrader extensions..." \
     && jupyter nbextension enable --sys-prefix --py nbgrader \
     && jupyter serverextension enable --sys-prefix --py nbgrader
 
-# Installing IR kernel
-RUN Rscript -e "install.packages('IRkernel')"
+# Activate IR kernel
 RUN Rscript -e "IRkernel::installspec()"
 
 ## document exposed port 8888 for jupyter notebook
