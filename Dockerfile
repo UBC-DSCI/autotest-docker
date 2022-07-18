@@ -32,7 +32,7 @@ FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 # set up environment variables
-ENV CONDA_VERSION=4.10.3-2 \
+ENV CONDA_VERSION=4.13.0-0 \
     CONDA_ENV=notebook \
     NB_USER=jovyan \
     NB_UID=1002 \
@@ -105,23 +105,24 @@ RUN echo "Installing Miniforge..." \
     && wget --quiet ${URL} -O miniconda.sh \
     && /bin/bash miniconda.sh -u -b -p ${CONDA_DIR} \
     && rm miniconda.sh \
-    && conda install -y -c conda-forge mamba bokeh \
+    && conda install -y -c conda-forge mamba \ 
     && mamba clean -afy \
     && find ${CONDA_DIR} -follow -type f -name '*.a' -delete \
     && find ${CONDA_DIR} -follow -type f -name '*.pyc' -delete
 
-# Create "notebook" conda environment
-RUN echo "Copying conda-linux-64.lock into homedir..."
-COPY ./conda-linux-64.lock ${HOME}
-RUN echo "Creating environment from conda-linux-64.lock..." \
-    && mamba create --name ${CONDA_ENV} --file conda-linux-64.lock \
-    && mamba clean -yaf \
-    && find ${CONDA_DIR} -follow -type f -name '*.a' -delete \
-    && find ${CONDA_DIR} -follow -type f -name '*.pyc' -delete \
-    && rm conda-linux-64.lock
-
-# installing nbgrader dependencies
-RUN conda install -c conda-forge nodejs
+## bokeh 
+## Create "notebook" conda environment
+#RUN echo "Copying conda-linux-64.lock into homedir..."
+#COPY ./conda-linux-64.lock ${HOME}
+#RUN echo "Creating environment from conda-linux-64.lock..." \
+#    && mamba create --name ${CONDA_ENV} --file conda-linux-64.lock \
+#    && mamba clean -yaf \
+#    && find ${CONDA_DIR} -follow -type f -name '*.a' -delete \
+#    && find ${CONDA_DIR} -follow -type f -name '*.pyc' -delete \
+#    && rm conda-linux-64.lock
+#
+## installing nbgrader dependencies
+RUN conda install -c bitsort "nodejs>=12"
 RUN conda install -c conda-forge yarn
 
 #RUN python -m pip install --upgrade pip setuptools wheel
