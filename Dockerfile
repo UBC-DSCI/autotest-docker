@@ -60,7 +60,7 @@ RUN echo "Creating ${NB_USER} user and home folder structure..." \
 RUN echo "Installing basic apt-get packages..." \
     && apt-get update --fix-missing \
     && apt-get install -y apt-utils \
-    && apt-get install -y wget zip tzdata git build-essential gcc g++ gfortran \ 
+    && apt-get install -y wget zip tzdata git \ 
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -82,20 +82,6 @@ COPY ./jupyter_notebook_config.py /etc/jupyter/
 RUN echo "Moving nbgrader_config.py and tests.yml into home"
 COPY --chown=${NB_USER}:${NB_USER} ./nbgrader_config.py ${HOME}/
 COPY --chown=${NB_USER}:${NB_USER} ./tests.yml ${HOME}/
-
-RUN apt-get update --fix-missing
-# Installing R
-RUN apt-get install --no-install-recommends -y software-properties-common dirmngr
-# add the signing key (by Michael Rutter) for these repos
-# To verify key, run gpg --show-keys /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc 
-# Fingerprint: E298A3A825C0D65DFD57CBB651716619E084DAB9
-RUN wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
-# add the R 4.0 repo from CRAN -- adjust 'focal' to 'groovy' or 'bionic' as needed
-RUN add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
-RUN apt-get install --no-install-recommends -y r-base
-
-# install IR kernel
-RUN Rscript -e "install.packages('IRkernel')"
 
 # Switch to jovyan user
 USER ${NB_USER}
@@ -127,6 +113,7 @@ RUN echo "Installing Miniforge..." \
 RUN conda install -c bitsort "nodejs>=12"
 RUN conda install -c conda-forge yarn
 RUN conda install -c conda-forge pyyaml
+RUN conda install -c conda-forge r-recommended r-irkernel
 
 #RUN python -m pip install --upgrade pip setuptools wheel
 
